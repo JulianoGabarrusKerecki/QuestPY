@@ -1,39 +1,180 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bot do WhatsApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .question {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .response {
+            margin-top: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Bot do WhatsApp</h1>
-        <form id="investForm">
-            <label>Nome: <input type="text" id="userName" required></label><br>
-            <label>Telefone: <input type="text" id="userPhone" required></label><br>
-            <label>E-mail: <input type="email" id="userEmail" required></label><br>
-            <label>Idade: <input type="text" id="userAge" required></label><br>
-            <button type="button" onclick="submitForm()">Enviar</button>
-        </form>
-    </div>
-    <script>
-        function submitForm() {
-            const data = {
-                name: document.getElementById('userName').value,
-                phone: document.getElementById('userPhone').value,
-                email: document.getElementById('userEmail').value,
-                age: document.getElementById('userAge').value
-            };
 
-            fetch('/save_data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => alert('Dados salvos com sucesso!'))
-            .catch(error => console.error('Erro:', error));
+        <div class="question">Qual é o seu nome?</div>
+        <div class="response">
+            <input type="text" id="userName" placeholder="Digite seu nome aqui" pattern="[A-Za-z\s]+" title="Digite apenas letras">
+        </div>
+
+        <div class="question">Qual é o seu número de telefone?</div>
+        <div class="response">
+            <input type="text" id="userPhone" placeholder="Digite seu telefone aqui" pattern="[0-9]+" title="Digite apenas números">
+        </div>
+
+        <div class="question">Qual é o seu e-mail?</div>
+        <div class="response">
+            <input type="text" id="userEmail" placeholder="Digite seu e-mail aqui" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="Digite um e-mail válido">
+        </div>
+
+        <div class="question">Qual é a sua idade?</div>
+        <div class="response">
+            <input type="text" id="userAge" placeholder="Digite sua idade aqui" pattern="[0-9]+" title="Digite apenas números">
+        </div>
+
+        <div class="question">Você já investiu antes?</div>
+        <div class="response">
+            <label>
+                <input type="radio" name="invested" value="Sim" checked> Sim
+            </label>
+            <label>
+                <input type="radio" name="invested" value="Não"> Não
+            </label>
+        </div>
+
+        <div class="question">Você prefere retorno mensal ou ao final?</div>
+        <div class="response">
+            <label>
+                <input type="radio" name="return" value="Mensal" checked> Mensal
+            </label>
+            <label>
+                <input type="radio" name="return" value="Final"> Final
+            </label>
+        </div>
+
+        <div class="question">Você se considera um investidor novo ou experiente?</div>
+        <div class="response">
+            <label>
+                <input type="radio" name="experience" value="Novo" checked> Novo
+            </label>
+            <label>
+                <input type="radio" name="experience" value="Experiente"> Experiente
+            </label>
+        </div>
+
+        <div class="question">Qual é o seu perfil de risco?</div>
+        <div class="response">
+            <label>
+                <input type="radio" name="riskProfile" value="Conservador" checked> Conservador
+            </label>
+            <label>
+                <input type="radio" name="riskProfile" value="Moderado"> Moderado
+            </label>
+            <label>
+                <input type="radio" name="riskProfile" value="Agressivo"> Agressivo
+            </label>
+        </div>
+
+        <div class="response">
+            <button onclick="submitResponse()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        function submitResponse() {
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            const email = document.getElementById('userEmail').value;
+            const age = document.getElementById('userAge').value;
+            const invested = document.querySelector('input[name="invested"]:checked').value;
+            const returnPref = document.querySelector('input[name="return"]:checked').value;
+            const experience = document.querySelector('input[name="experience"]:checked').value;
+            const riskProfile = document.querySelector('input[name="riskProfile"]:checked').value;
+
+            // Resumo das respostas
+            const confirmationMessage = `
+                Nome: ${name}
+                Telefone: ${phone}
+                E-mail: ${email}
+                Idade: ${age}
+                Já investiu: ${invested}
+                Retorno preferido: ${returnPref}
+                Experiência do investidor: ${experience}
+                Perfil de risco: ${riskProfile}
+            `;
+
+            // Confirmar antes de enviar
+            if (confirm("Confirma as seguintes informações?\n\n" + confirmationMessage)) {
+                // Enviar os dados para o backend
+                fetch('/save_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        name: name, 
+                        phone: phone, 
+                        email: email, 
+                        age: age, 
+                        invested: invested, 
+                        return: returnPref, 
+                        experience: experience,
+                        riskProfile: riskProfile
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Dados salvos com sucesso!');
+                    // Limpar as caixas de entrada
+                    document.getElementById('userName').value = '';
+                    document.getElementById('userPhone').value = '';
+                    document.getElementById('userEmail').value = '';
+                    document.getElementById('userAge').value = '';
+                    document.querySelectorAll('input[type="radio"]:checked').forEach(radio => radio.checked = false);
+                })
+                .catch((error) => {
+                    console.error('Erro ao salvar os dados:', error);
+                });
+            }
         }
     </script>
 </body>
